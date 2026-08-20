@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Backend/">
+    <Project Path="ShopEase/Backend/ShopEase.Api/ShopEase.Api.csproj" />
+    <Project Path="ShopEase/Backend/ShopEase.Application/ShopEase.Application.csproj" />
+    <Project Path="ShopEase/Backend/ShopEase.Domain/ShopEase.Domain.csproj" />
+    <Project Path="ShopEase/Backend/ShopEase.Infrastructure/ShopEase.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Backend/tests/">
+    <Project Path="ShopEase/Backend/tests/ShopEase.Api.Tests/ShopEase.Api.Tests.csproj" />
+  </Folder>
+  <Project Path="ShopEase/src/ShopEase.Web/ShopEase.Web.esproj" />
+</Solution>
