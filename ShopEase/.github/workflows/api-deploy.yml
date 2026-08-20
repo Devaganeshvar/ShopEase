@@ -5,6 +5,8 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -13,16 +15,23 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Publish .NET API
-        run: dotnet publish <project>.csproj -c Release -o ./publish
+      - name: Restore dependencies
+        run: dotnet restore Backend/ShopEase.Api/ShopEase.Api.csproj
+
+      - name: Build API
+        run: dotnet build Backend/ShopEase.Api/ShopEase.Api.csproj --configuration Release --no-restore
+
+      - name: Publish API
+        run: dotnet publish Backend/ShopEase.Api/ShopEase.Api.csproj --configuration Release --no-build --output ./publish
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: <app-name>
+          app-name: shopease-capstone--api
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ./publish
