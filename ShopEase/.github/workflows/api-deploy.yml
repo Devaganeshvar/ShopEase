@@ -20,12 +20,6 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore Backend/ShopEase.Api/ShopEase.Api.csproj
-
-      - name: Build API
-        run: dotnet build Backend/ShopEase.Api/ShopEase.Api.csproj --configuration Release --no-restore
-
       - name: Publish API
         run: dotnet publish Backend/ShopEase.Api/ShopEase.Api.csproj --configuration Release --no-build --output ./publish
 
