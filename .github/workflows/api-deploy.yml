@@ -1,46 +1,64 @@
-name: Backend CI
+name: Backend CI and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths:
       - 'Backend/**'
       - '.github/workflows/api-deploy.yml'
+
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
     paths:
       - 'Backend/**'
       - '.github/workflows/api-deploy.yml'
+
+  workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: Backend
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '8.0.x'
+
+      - name: Check repository structure
+        run: |
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          pwd
+          ls -la
+          find . -maxdepth 3 -name "*.csproj" -print
 
       - name: Restore dependencies
-        run: dotnet restore ShopEase.Api/ShopEase.Api.csproj
+        run: dotnet restore Backend/ShopEase.Api/ShopEase.Api.csproj
 
       - name: Build
-        run: dotnet build ShopEase/Backend/ShopEase.Api/ShopEase.Api.csproj --no-restore --configuration Release
+        run: dotnet build Backend/ShopEase.Api/ShopEase.Api.csproj --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test ShopEase/Backend/tests/ShopEase.Api.Tests/ShopEase.Api.Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test Backend/tests/ShopEase.Api.Tests/ShopEase.Api.Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
 
-      - name: Publish test results
+      - name: Publish API
+        run: dotnet publish Backend/ShopEase.Api/ShopEase.Api.csproj --configuration Release --no-build --output ./publish
+
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: ShopEase/Backend/tests/ShopEase.Api.Tests/TestResults/test-results.trx
+          path: Backend/tests/ShopEase.Api.Tests/TestResults/test-results.trx
+
+      - name: Deploy API to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: shopease-capstone--api
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish
