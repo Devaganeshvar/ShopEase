@@ -21,7 +21,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Publish API
-        run: dotnet publish Backend/ShopEase.Api/ShopEase.Api.csproj --configuration Release --no-build --output ./publish
+        run: dotnet publish Backend/ShopEase.Api/ShopEase.Api.csproj -c Release -o ./publish
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
